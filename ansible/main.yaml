@@ -1,0 +1,72 @@
+- hosts: inetRouter
+  become: true
+  tasks:
+  - name: install iptables
+    yum:
+      name:
+      - iptables
+      - iptables-services
+    state: present
+    update_cache: true
+
+  - name: copy iptables config
+    template:
+      src: iptables
+      dest: /etc/sysconfig/iptables
+      owner: root
+      group: root
+      mode: 0600
+
+  - name: start and enable iptables service
+    service:
+      name: iptables
+      state: restarted
+      enabled: true
+
+- hosts: inetRouter, centralRouter, office1Router, office2Router
+  become: true
+  tasks:
+  - name: set up forward packages across routers
+    sysctl:
+      name: net.ipv4.conf.all.forwarding
+      value: '1'
+      state: present
+
+- hosts: centralRouter, centralServer
+  become: true
+  tasks:
+  - name: Set DEFROUTE
+    lineinfile:
+      dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+      regexp: '.*DEFROUTE.*'
+      line: 'DEFROUTE=no'
+      state: present  
+
+- hosts: centralRouter
+  become: true
+  tasks:
+  - name: add default gateway for centralRouter
+    lineinfile:
+      dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+      line: GATEWAY=192.168.255.1
+
+  - name: restart network
+    systemd:
+      name: network
+      enabled: yes
+      state: restarted  
+
+- hosts: centralServer
+  become: true
+  tasks:
+  - name: add default gateway for centralServer
+    lineinfile:
+      dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+      line: GATEWAY=192.168.0.1
+
+  - name: restart network
+    systemd:
+      name: network
+      enabled: yes
+      state: restarted  
+      
