@@ -1,6 +1,6 @@
 MACHINES = {
 :inetRouter => {
-:box_name => "centos/7",
+:box_name => "centos7",
 :vm_name => "inetRouter",
 #:public => {:ip => '10.10.10.1', :adapter => 1},
 :net => [
@@ -10,7 +10,7 @@ virtualbox__intnet: "router-net"},
 ]
 },
 :centralRouter => {
-:box_name => "centos/7",
+:box_name => "centos7",
 :vm_name => "centralRouter",
 :net => [
 {ip: '192.168.255.2', adapter: 2, netmask: "255.255.255.252",
@@ -29,7 +29,7 @@ virtualbox__intnet: "office2-central"},
 ]
 },
 :centralServer => {
-:box_name => "centos/7",
+:box_name => "centos7",
 :vm_name => "centralServer",
 :net => [
 {ip: '192.168.0.2', adapter: 2, netmask: "255.255.255.240",
@@ -87,12 +87,19 @@ virtualbox__intnet: "office1-net"},
     {ip: '192.168.50.31', adapter: 8},
     ]
     }
-    
+}    
 Vagrant.configure("2") do |config|
     MACHINES.each do |boxname, boxconfig|
         config.vm.define boxname do |box|
         box.vm.box = boxconfig[:box_name]
         box.vm.host_name = boxname.to_s
+	  if boxconfig[:vm_name] == "office2Server"
+		box.vm.provision "ansible" do |ansible|
+		ansible.playbook = "ansible/main.yaml"
+		ansible.host_key_checking = "false"
+		ansible.limit = "all"
+		end
+	  end
         boxconfig[:net].each do |ipconf|
         box.vm.network "private_network", ipconf
         end
@@ -107,22 +114,19 @@ Vagrant.configure("2") do |config|
         when "inetRouter"
         box.vm.provision "shell", run: "always", inline: <<-SHELL
         sysctl net.ipv4.conf.all.forwarding=1
-        iptables -t nat -A POSTROUTING ! -d 192.168.0.0/16 -o eth0 -j
-        MASQUERADE
+        iptables -t nat -A POSTROUTING ! -d 192.168.0.0/16 -o eth0 -j MASQUERADE
         SHELL
         when "centralRouter"
         box.vm.provision "shell", run: "always", inline: <<-SHELL
         sysctl net.ipv4.conf.all.forwarding=1
         echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
-        echo "GATEWAY=192.168.255.1" >>
-        /etc/sysconfig/network-scripts/ifcfg-eth1
+        echo "GATEWAY=192.168.255.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
         systemctl restart network
         SHELL
         when "centralServer"
         box.vm.provision "shell", run: "always", inline: <<-SHELL
         echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
-        echo "GATEWAY=192.168.0.1" >>
-        /etc/sysconfig/network-scripts/ifcfg-eth1
+        echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
         systemctl restart network
         SHELL
         end

@@ -32,27 +32,6 @@
       value: '1'
       state: present
 
-- hosts: office1Server, office2Server, centralServer
-  become: true
-  tasks:
-  - name: install nettools
-    yum:
-      name:
-      - mtr
-      - traceroute
-      state: present
-      update_cache: true
-    when: ansible_distribution == 'CentOS'
-
-  - name: install nettools
-    apt:
-      name:
-      - mtr
-      - traceroute
-      state: present
-      update_cache: true
-    when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
-
 - hosts: centralRouter, centralServer
   become: true
   tasks:
@@ -92,27 +71,17 @@
       state: restarted  
       
 
-- hosts: office1Server
+- hosts: centralRouter, centralServer
   become: true
   tasks:
   - name: set up route on office1Server
     template:
       src: office1Server_route.j2
-      dest: /etc/netplan/50-vagrant.yaml
+provision      dest: /etc/netplan/50-vagrant.yaml
       owner: root
       group: root
       mode: 0644
 
-- hosts: office1Router
-  become: true
-  tasks:
-  - name: set up route on office1Router
-    template:
-      src: office1Router_route.j2
-      dest: /etc/netplan/50-vagrant.yaml
-      owner: root
-      group: root
-      mode: 0644
 
 - hosts: office2Server
   become: true
@@ -125,28 +94,6 @@
       group: root
       mode: 0644
 
-#  - name: up eth1
-#    command: ip route del default via 10.0.2.2 dev eth0
-
-#  - name: up eth1
-#    command: ifup --ignore-errors eth1
-
-- hosts: office2Router
-  become: true
-  tasks:
-  - name: set up route on office2Router
-    template:
-      src: office2Router_route.j2
-      dest: /etc/network/interfaces
-      owner: root
-      group: root
-      mode: 0644
-
-#  - name: up eth1
-#    command: ip route del default via 10.0.2.2 dev eth0 
-
-#  - name: up eth1
-#    command: ifup --ignore-errors eth1
 
 - hosts: centralRouter
   become: true
@@ -159,36 +106,10 @@
       group: root
       mode: 0644
 
-  - name: set up route on centralRouter eth5
+  - name: set up route on centralRouter eth1
     template:
       src: centralRouter_route_eth5.j2
       dest: /etc/sysconfig/network-scripts/route-eth5
       owner: root
       group: root
       mode: 0644
-
-  - name: set up route on centralRouter eth6
-    template:
-      src: centralRouter_route_eth6.j2
-      dest: /etc/sysconfig/network-scripts/route-eth6
-      owner: root
-      group: root
-      mode: 0644
-
-- hosts: inetRouter
-  become: true
-  tasks:
-  - name: set up route on inetRouter eth1
-    template:
-      src: inetRouter_route_eth1.j2
-      dest: /etc/sysconfig/network-scripts/route-eth1
-      owner: root
-      group: root
-      mode: 0644
-
-- hosts: all
-  become: true
-  tasks:
-  - name: reboot
-    reboot:
-      reboot_timeout: 3600
