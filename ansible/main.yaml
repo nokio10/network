@@ -125,11 +125,6 @@
       group: root
       mode: 0644
 
-#  - name: up eth1
-#    command: ip route del default via 10.0.2.2 dev eth0
-
-#  - name: up eth1
-#    command: ifup --ignore-errors eth1
 
 - hosts: office2Router
   become: true
@@ -142,11 +137,6 @@
       group: root
       mode: 0644
 
-#  - name: up eth1
-#    command: ip route del default via 10.0.2.2 dev eth0 
-
-#  - name: up eth1
-#    command: ifup --ignore-errors eth1
 
 - hosts: centralRouter
   become: true
