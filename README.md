@@ -33,3 +33,50 @@ vagrant поднимает для связи
 ![image](https://user-images.githubusercontent.com/98832702/177270809-39241566-336c-4d30-834e-60560a3215a4.png)
 
 # Практическая часть
+
+Ниже представленная схема сети 
+
+![image](https://user-images.githubusercontent.com/98832702/177271310-0c292539-5251-4cbc-b655-dcfc2a660a95.png)
+
+Проверяю работу после развертывания стенда командой ```vagrant up```
+
+
+```
+root@office2Server:~# traceroute ya.ru
+traceroute to ya.ru (87.250.250.242), 30 hops max, 60 byte packets
+ 1  192.168.1.1 (192.168.1.1)  4.732 ms  4.386 ms  4.265 ms
+ 2  192.168.255.5 (192.168.255.5)  2.553 ms  2.416 ms  2.151 ms
+ 3  192.168.255.1 (192.168.255.1)  3.983 ms  4.780 ms  4.499 ms
+ 4  * * *
+ 5  * * *
+ 6  * * *
+ 7  * * *
+ 8  host-static-212-0-200-232.moldtelecom.md (212.0.200.232)  90.935 ms host-static-212-0-200-234.moldtelecom.md (212.0.200.234)  88.311 ms host-static-212-0-200-232.moldtelecom.md (212.0.200.232)  88.610 ms
+ 9  212-0-199-229.agg12.C-IGW-1.telco.md (212.0.199.229)  87.217 ms 212-0-200-146.agg11.C-IGW-1.telco.md (212.0.200.146)  84.949 ms 212-0-200-176.agg11.C-IGW-2.telco.md (212.0.200.176)  89.956 ms
+10  ipv4.de-cix.fra.de.as208722.yandex.com (80.81.192.251)  132.639 ms  132.416 ms  131.650 ms
+11  178.18.226.119.ix.dataix.eu (178.18.226.119)  175.276 ms  174.131 ms *
+12  * * *
+13  * * *
+14  ya.ru (87.250.250.242)  177.746 ms  177.458 ms  171.416 ms
+```
+
+```
+root@office1Server:~# traceroute ya.ru
+traceroute to ya.ru (87.250.250.242), 30 hops max, 60 byte packets
+ 1  _gateway (192.168.2.129)  1.675 ms  1.561 ms  1.861 ms
+ 2  192.168.255.9 (192.168.255.9)  2.475 ms  4.167 ms  4.103 ms
+ 3  192.168.255.1 (192.168.255.1)  4.038 ms  4.506 ms  4.413 ms
+ 4  * * *
+ 5  * * *
+ 6  * * *
+ 7  * * *
+ 8  host-static-212-0-200-234.moldtelecom.md (212.0.200.234)  88.944 ms  88.300 ms  88.714 ms
+ 9  212-0-199-229.agg12.C-IGW-1.telco.md (212.0.199.229)  88.618 ms  91.712 ms  91.457 ms
+10  * * *
+11  * 178.18.226.119.ix.dataix.eu (178.18.226.119)  170.673 ms *
+12  * * sas-32z3-ae1.yndx.net (87.250.239.183)  171.049 ms
+13  * * ya.ru (87.250.250.242)  173.874 ms
+```
+
+```
+
