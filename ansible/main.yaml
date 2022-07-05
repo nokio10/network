@@ -175,6 +175,14 @@
       group: root
       mode: 0644
 
+  - name: set up route on centralRouter eth2
+    template:
+      src: centralRouter_route_eth2.j2
+      dest: /etc/sysconfig/network-scripts/route-eth2
+      owner: root
+      group: root
+      mode: 0644
+
 - hosts: inetRouter
   become: true
   tasks:
